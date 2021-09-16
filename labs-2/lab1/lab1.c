@@ -21,7 +21,7 @@ void *printText(void *inputArg) {
 }
 
 void posixError(pthread_t threadID, int code, char *msg) {
-    fprintf(stderr, "[Error in thread id: %lu] %s: %s\n", threadID, msg, strerror(code));
+    fprintf(stderr, "[ThreadID: %lu] %s: %s\n", threadID, msg, strerror(code));
     exit(EXIT_FAILURE);
 }
 
