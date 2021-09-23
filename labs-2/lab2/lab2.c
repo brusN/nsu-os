@@ -35,7 +35,11 @@ int main() {
         posixError(pthread_self(), retCode, "Error while creating new thread");
     }
 
-    pthread_join(threadID, NULL);
+    retCode = pthread_join(threadID, NULL);
+    if (retCode != SUCCESS) {
+        posixError(pthread_self(), retCode, "Error while joining to thread");
+    }
+
     printText((void *)&arg1);
     return EXIT_SUCCESS;
 }
