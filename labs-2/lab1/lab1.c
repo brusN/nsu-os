@@ -35,6 +35,8 @@ int main() {
         posixError(pthread_self(), retCode, "Error while creating new thread");
     }
 
+    pthread_t
+
     printText((void *)&arg1);
     pthread_exit(NULL);
 }
