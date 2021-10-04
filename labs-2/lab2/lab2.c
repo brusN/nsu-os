@@ -17,7 +17,8 @@ void *printText(void *inputArg) {
     for (int i = 0; i < arg->count; ++i) {
         printf("%s", arg->text);
     }
-    return NULL;
+    char * text = "text";
+    pthread_exit(text);
 }
 
 void posixError(pthread_t threadID, int code, char *msg) {
@@ -35,6 +36,7 @@ int main() {
         posixError(pthread_self(), retCode, "Error while creating new thread");
     }
 
+    char *result;
     retCode = pthread_join(threadID, NULL);
     if (retCode != SUCCESS) {
         posixError(pthread_self(), retCode, "Error while joining to thread");
