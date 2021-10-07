@@ -89,6 +89,7 @@ double collectResults(pthread_t *threadID, int numThreads, threadFuncArg *args) 
         if (retCode != SUCCESS) {
             free(threadID);
             free(args);
+
             printPosixThreadError(pthread_self(), retCode, "Error while joining thread");
         }
         result += *(double *)threadResult;

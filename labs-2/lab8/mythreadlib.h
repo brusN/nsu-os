@@ -8,6 +8,7 @@
 
 #define SUCCESS 0
 #define FAILURE 1
+#define ERR_MSG_BUFFER_LEN 256
 
 void printError(char *msg);
 void printPosixThreadError(pthread_t threadID, int code, char *msg);
