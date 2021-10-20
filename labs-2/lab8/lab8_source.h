@@ -5,10 +5,21 @@
 #include <string.h>
 #include <errno.h>
 #include <pthread.h>
-#include "mythreadlib.h"
+#include <limits.h>
+#include "../mylib/mylib.h"
+#include "../mylib/error_handling.h"
 
-#define CUR_INPUT_ARGS_NUMBER 2
-#define NUM_ITERATIONS 200000000
+#define SUCCESS 0
+#define FAILURE 1
+#define CUR_INPUT_ARGS_NUMBER 3
+
+
+
+typedef struct st_inputArgs inputArgs;
+struct st_inputArgs {
+    int numThreads;
+    int numIterations;
+};
 
 typedef struct st_threadFuncArg threadFuncArg;
 struct st_threadFuncArg {
@@ -17,11 +28,24 @@ struct st_threadFuncArg {
     double result;
 };
 
-void parseInputArguments(int argc, char **argv, int *threadsNumber);
-int *distributeIterationsNumber(int iterationsNumber, int threadsNumber);
+
+// For function parseInputArgs(3)
+enum parseInputArgs_states {
+    parseInputArgs_SUCCESS = 0,
+    parseInputArgs_INVALID_ARGS_COUNT,
+    parseInputArgs_NOT_NUMBER,
+    parseInputArgs_ERANGE,
+    parseInputArgs_INVALID_NUM_THREADS,
+    parseInputArgs_INVALID_NUM_ITERATIONS
+};
+
+int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues);
+void invalidInputArgsExit(int retCode);
+ThreadErrorState calcPi(int numThreads, int numIterations, double *result);
+void distributeIterationsNumber(int numThreads, int numIterations, int *distribute);
+threadFuncArg * createThreadsFunctionArgs(int numThreads, int numIterations, const int *distribute, threadFuncArg *args);
 void * threadTask(void *arg);
-threadFuncArg *createThreadsFunctionArgs(int numThreads, int numIterations);
-pthread_t *createThreadsForTask(int numThreads, void *(*task)(void *), threadFuncArg *args);
-double collectResults(pthread_t *threadID, int numThreads, threadFuncArg *args);
+ThreadErrorState createThreadsForTask(int numThreads, void *(*task)(void *), threadFuncArg *args, pthread_t *threadID);
+ThreadErrorState collectResults(pthread_t *threadID, int numThreads, threadFuncArg *args, double *result);
 
 #endif //NSU_OS_LABS_LAB8_SOURCE_H

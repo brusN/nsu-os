@@ -1,18 +1,27 @@
 #include <stdio.h>
 #include "lab8_source.h"
 
+// Устранить проблемы с некорректным вводом данных [DONE]
+// Сделать так, чтобы функции внутри себя не крашили программу
+// Разобраться, влияет ли количество потоков на точность. Объяснить почему или опровергнуть.
 
 int main(int argc, char **argv) {
-    int numThreads = 0;
-    parseInputArguments(argc, argv, &numThreads);
-    printf("Number of threads: %d\n", numThreads);
+    // Parsing and validating input arguments. Both args must be positive numbers
+    inputArgs inputArgsValues;
+    int retCode = parseInputArgs(argc, argv, &inputArgsValues);
+    if (retCode != parseInputArgs_SUCCESS) {
+        invalidInputArgsExit(retCode);
+    }
+    printf("Number of threads: %d\n", inputArgsValues.numThreads);
+    printf("Number of iterations: %d\n", inputArgsValues.numIterations);
 
-    threadFuncArg *args = createThreadsFunctionArgs(numThreads, NUM_ITERATIONS);
-    pthread_t *threadID = createThreadsForTask(numThreads, threadTask, args);
-    double pi = collectResults(threadID, numThreads, args) * 4.0;
+    // Calculating Pi
+    double pi;
+    ThreadErrorState state = calcPi(inputArgsValues.numThreads, inputArgsValues.numIterations, &pi);
+    if (!isThreadErrStateSuccess(state)) {
+        threadErrorExit(state);
+    }
+
     printf("Pi number has been calculated: %.15g\n", pi);
-
-    free(threadID);
-    free(args);
     return EXIT_SUCCESS;
 }
