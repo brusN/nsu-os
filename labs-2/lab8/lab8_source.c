@@ -15,7 +15,7 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
             return parseInputArgs_NOT_NUMBER;
         }
     }
-    if (parsedNumThreads < INT_MAX || parsedNumThreads > INT_MAX) {
+    if (parsedNumThreads < INT_MIN || parsedNumThreads > INT_MAX) {
         return parseInputArgs_ERANGE;
     }
     if (parsedNumThreads <= 0) {
