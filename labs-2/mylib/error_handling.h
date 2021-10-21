@@ -7,7 +7,9 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define ERR_MSG_BUFFER_LEN 256
+#define SUCCESS 0
+#define FAILURE 1
+#define ERR_MSG_BUFFER_LEN 32
 #define SEE_ERRNO_CODE -1
 
 // Simple functions

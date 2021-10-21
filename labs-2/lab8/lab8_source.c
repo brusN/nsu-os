@@ -11,9 +11,8 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     if (retCode != str2num_SUCCESS) {
         if (retCode == str2num_ERANGE) {
             return parseInputArgs_ERANGE;
-        } else {
-            return parseInputArgs_NOT_NUMBER;
         }
+        return parseInputArgs_NOT_NUMBER;
     }
     if (parsedNumThreads < INT_MIN || parsedNumThreads > INT_MAX) {
         return parseInputArgs_ERANGE;
@@ -29,9 +28,8 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     if (retCode != str2num_SUCCESS) {
         if (retCode == str2num_ERANGE) {
             return parseInputArgs_ERANGE;
-        } else {
-            return parseInputArgs_NOT_NUMBER;
         }
+        return parseInputArgs_NOT_NUMBER;
     }
     if (parsedNumIterations < INT_MIN || parsedNumIterations > INT_MAX) {
         return parseInputArgs_ERANGE;
@@ -127,25 +125,15 @@ ThreadErrorState collectResults(pthread_t *threadID, int numThreads, threadFuncA
 ThreadErrorState calcPi(int numThreads, int numIterations, double *result) {
 
     // Distributing parts to calculating between threads
-    int *distribute = (int *)malloc(sizeof(int) * numThreads);
-    if (distribute == NULL) {
-        return createThreadErrState(pthread_self(), SEE_ERRNO_CODE);
-    }
+    int distribute[numThreads];
     distributeIterationsNumber(numThreads, numIterations, distribute);
 
     // Creating arguments for thread functions
-    threadFuncArg *threadArgs = (threadFuncArg *)malloc(sizeof(threadFuncArg) * numThreads);
-    if (threadArgs == NULL) {
-        return createThreadErrState(pthread_self(), SEE_ERRNO_CODE);
-    }
-    threadArgs = createThreadsFunctionArgs(numThreads, numIterations, distribute, threadArgs);
-    free(distribute);
+    threadFuncArg threadArgs[numThreads];
+    createThreadsFunctionArgs(numThreads, numIterations, distribute, threadArgs);
 
     // Creating threads for calculating
-    pthread_t *threadID = (pthread_t *)malloc(sizeof(pthread_t) * numThreads);
-    if (threadID == NULL) {
-        return createThreadErrState(pthread_self(), SEE_ERRNO_CODE);
-    }
+    pthread_t threadID[numThreads];
     ThreadErrorState state = createThreadsForTask(numThreads, threadTask, threadArgs, threadID);
     if (!isThreadErrStateSuccess(state)) {
         return state;

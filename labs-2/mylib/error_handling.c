@@ -14,27 +14,22 @@ ThreadErrorState createThreadErrState(pthread_t thID, int errCode) {
 }
 
 int isThreadErrStateSuccess(ThreadErrorState state) {
-    return state.errCode == 0;
+    return state.errCode == SUCCESS;
 }
 
 void threadErrorExit(ThreadErrorState state) {
-    int code;
-    if (state.errCode == SEE_ERRNO_CODE) {
-        code = errno;
-    } else {
-        code = state.errCode;
-    }
-    printPosixThreadError(state.thID, code);
+    printPosixThreadError(state.thID, state.errCode);
     exit(EXIT_FAILURE);
 }
 
 void printPosixThreadError(pthread_t threadID, int code) {
-    int bufferSize = ERR_MSG_BUFFER_LEN;
-    char *errMsgBuffer = (char *)malloc(bufferSize);
-    while (strerror_r(code, errMsgBuffer, bufferSize) != 0 && errno == ERANGE) {
-        bufferSize *= 2;
-        errMsgBuffer = realloc(errMsgBuffer, bufferSize);
+    char errMsgBuffer[ERR_MSG_BUFFER_LEN];
+    if (strerror_r(code, errMsgBuffer, ERR_MSG_BUFFER_LEN) != SUCCESS) {
+        if (errno == EINVAL) {
+            fprintf(stderr, "Unknown error code!\n");
+        }
+        fprintf(stderr, "Insufficient storage to contain the generated message string!\n");
+    } else {
+        fprintf(stderr, "[ThreadID: %lu] %s\n", threadID, errMsgBuffer);
     }
-    fprintf(stderr, "[ThreadID: %lu] %s\n", threadID, strerror(code));
-    free(errMsgBuffer);
 }
