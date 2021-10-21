@@ -15,6 +15,6 @@ enum str2num_states {
 };
 
 // Improved strtol with error handling
-int str2long(long *number, char *start, char **end, int radix);
+int str2long(long *number, char *start);
 
 #endif //NSU_OS_LABS_MYLIB_H

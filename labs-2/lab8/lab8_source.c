@@ -7,7 +7,7 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
 
     // Num threads parsing ~ argv[1]
     long parsedNumThreads;
-    int retCode = str2long(&parsedNumThreads, argv[1], NULL, 10);
+    int retCode = str2long(&parsedNumThreads, argv[1]);
     if (retCode != str2num_SUCCESS) {
         if (retCode == str2num_ERANGE) {
             return parseInputArgs_ERANGE;
@@ -25,7 +25,7 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
 
     // Num iterations parsing ~ argv[2]
     long parsedNumIterations;
-    retCode = str2long(&parsedNumIterations, argv[2], NULL, 10);
+    retCode = str2long(&parsedNumIterations, argv[2]);
     if (retCode != str2num_SUCCESS) {
         if (retCode == str2num_ERANGE) {
             return parseInputArgs_ERANGE;

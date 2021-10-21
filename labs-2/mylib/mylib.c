@@ -1,6 +1,7 @@
 #include "mylib.h"
 
-int str2long(long *number, char *start, char **end, int radix) {
+// Only for decimal numbers
+int str2long(long *number, char *start) {
     // Is null or empty string check
     if (start == NULL || start[0] == '\0') {
         return str2num_EMPTY_STR;
@@ -8,7 +9,10 @@ int str2long(long *number, char *start, char **end, int radix) {
 
     // Is string a number check
     {
-        int i = 0;
+        if (!(start[0] == '+' || start[0] == '-' || isdigit(start[0]))) {
+            return str2num_NOT_NUMBER;
+        }
+        int i = 1;
         while (isdigit(start[i])) {
             ++i;
         }
@@ -17,7 +21,7 @@ int str2long(long *number, char *start, char **end, int radix) {
         }
     }
 
-    *number = strtol(start, end, radix);
+    *number = strtol(start, NULL, 10);
     if (errno == ERANGE) {
         return str2num_ERANGE;
     }
