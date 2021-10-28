@@ -8,16 +8,10 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     // Num threads parsing ~ argv[1]
     long parsedNumThreads;
     int retCode = str2long(&parsedNumThreads, argv[1]);
-    if (retCode == str2num_ERANGE) {
-        return parseInputArgs_ERANGE;
-    }
     if (retCode == str2num_NOT_NUMBER) {
         return parseInputArgs_NOT_NUMBER;
     }
-    if (parsedNumThreads < INT_MIN || parsedNumThreads > INT_MAX) {
-        return parseInputArgs_ERANGE;
-    }
-    if (parsedNumThreads <= 0) {
+    if (retCode == str2num_ERANGE || parsedNumThreads <= 0 || parsedNumThreads > MAX_THREADS_COUNT) {
         return parseInputArgs_INVALID_NUM_THREADS;
     }
     inputArgsValues->numThreads = (int)parsedNumThreads;
@@ -25,16 +19,10 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     // Num iterations parsing ~ argv[2]
     long parsedNumIterations;
     retCode = str2long(&parsedNumIterations, argv[2]);
-    if (retCode == str2num_ERANGE) {
-        return parseInputArgs_ERANGE;
-    }
     if (retCode == str2num_NOT_NUMBER) {
         return parseInputArgs_NOT_NUMBER;
     }
-    if (parsedNumIterations < INT_MIN || parsedNumIterations > INT_MAX) {
-        return parseInputArgs_ERANGE;
-    }
-    if (parsedNumIterations <= 0) {
+    if (retCode == str2num_ERANGE || parsedNumIterations <= 0 || parsedNumIterations > MAX_ITERATIONS_COUNT) {
         return parseInputArgs_INVALID_NUM_ITERATIONS;
     }
     inputArgsValues->numIterations = (int)parsedNumIterations;
@@ -46,18 +34,24 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
 void invalidInputArgsExit(int retCode) {
     switch (retCode) {
         case parseInputArgs_INVALID_ARGS_COUNT:
-            errorExit("Invalid input args count! Excepted two arguments: number of threads, numbers of iterations");
+            fprintf(stderr, "[Error] Invalid input args count! Excepted two arguments: number of threads, numbers of iteration\n");
+            break;
         case parseInputArgs_NOT_NUMBER:
-            errorExit("Input argument isn't a number");
+            fprintf(stderr, "[Error] Input argument isn't a number\n");
+            break;
         case parseInputArgs_ERANGE:
-            errorExit("Input argument value is out of integer range");
+            fprintf(stderr, "[Error] Input argument value is out of integer range\n");
+            break;
         case parseInputArgs_INVALID_NUM_THREADS:
-            errorExit("Invalid num threads! Must be > 0");
+            fprintf(stderr, "[Error] Invalid num threads! Must be > 0. Threads count limit: %d\n", MAX_THREADS_COUNT);
+            break;
         case parseInputArgs_INVALID_NUM_ITERATIONS:
-            errorExit("Invalid num iterations! Must be > 0");
+            fprintf(stderr, "[Error] Invalid num iterations! Must be > 0. Iterations count limit: %d\n", MAX_ITERATIONS_COUNT);
+            break;
         default:
-            errorExit("Unknown error return code");
+            fprintf(stderr, "[Error] Unknown error return code\n");
     }
+    exit(EXIT_FAILURE);
 }
 
 void distributeIterationsNumber(int numThreads, int numIterations, int *distribute) {

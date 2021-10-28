@@ -1,11 +1,5 @@
 #include "error_handling.h"
 
-// Prints message and do exit(EXIT_FAILURE)
-void errorExit(char *errorMsg) {
-    fprintf(stderr, "[Error] %s\n", errorMsg);
-    exit(EXIT_FAILURE);
-}
-
 ThreadErrorState createThreadErrState(pthread_t thID, int errCode) {
     ThreadErrorState state;
     state.thID = thID;

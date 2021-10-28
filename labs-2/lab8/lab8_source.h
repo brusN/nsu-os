@@ -11,6 +11,8 @@
 
 #define SUCCESS 0
 #define FAILURE 1
+#define MAX_THREADS_COUNT 256
+#define MAX_ITERATIONS_COUNT INT_MAX
 #define CUR_INPUT_ARGS_NUMBER 3
 
 typedef struct st_inputArgs inputArgs;

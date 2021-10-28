@@ -13,7 +13,7 @@
 #define SEE_ERRNO_CODE -1
 
 // Simple functions
-void errorExit(char *errorMsg);
+void printError(char *errorMsg);
 
 // Error handling in threads realization
 typedef struct st_ThreadErrorState ThreadErrorState;

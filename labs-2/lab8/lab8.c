@@ -8,8 +8,6 @@ int main(int argc, char **argv) {
     if (retCode != parseInputArgs_SUCCESS) {
         invalidInputArgsExit(retCode);
     }
-    printf("Number of threads: %d\n", inputArgsValues.numThreads);
-    printf("Number of iterations: %d\n", inputArgsValues.numIterations);
 
     // Calculating Pi
     double pi;
