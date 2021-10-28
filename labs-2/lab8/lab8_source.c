@@ -8,10 +8,10 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     // Num threads parsing ~ argv[1]
     long parsedNumThreads;
     int retCode = str2long(&parsedNumThreads, argv[1]);
-    if (retCode != str2num_SUCCESS) {
-        if (retCode == str2num_ERANGE) {
-            return parseInputArgs_ERANGE;
-        }
+    if (retCode == str2num_ERANGE) {
+        return parseInputArgs_ERANGE;
+    }
+    if (retCode == str2num_NOT_NUMBER) {
         return parseInputArgs_NOT_NUMBER;
     }
     if (parsedNumThreads < INT_MIN || parsedNumThreads > INT_MAX) {
@@ -25,10 +25,10 @@ int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues) {
     // Num iterations parsing ~ argv[2]
     long parsedNumIterations;
     retCode = str2long(&parsedNumIterations, argv[2]);
-    if (retCode != str2num_SUCCESS) {
-        if (retCode == str2num_ERANGE) {
-            return parseInputArgs_ERANGE;
-        }
+    if (retCode == str2num_ERANGE) {
+        return parseInputArgs_ERANGE;
+    }
+    if (retCode == str2num_NOT_NUMBER) {
         return parseInputArgs_NOT_NUMBER;
     }
     if (parsedNumIterations < INT_MIN || parsedNumIterations > INT_MAX) {

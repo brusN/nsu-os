@@ -13,8 +13,6 @@
 #define FAILURE 1
 #define CUR_INPUT_ARGS_NUMBER 3
 
-
-
 typedef struct st_inputArgs inputArgs;
 struct st_inputArgs {
     int numThreads;
@@ -38,6 +36,7 @@ enum parseInputArgs_states {
     parseInputArgs_INVALID_NUM_THREADS,
     parseInputArgs_INVALID_NUM_ITERATIONS
 };
+
 
 int parseInputArgs(int argc, char **argv, inputArgs *inputArgsValues);
 void invalidInputArgsExit(int retCode);
