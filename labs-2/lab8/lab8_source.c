@@ -84,8 +84,11 @@ threadFuncArg * createThreadsFunctionArgs(int numThreads, int numIterations, con
 void * threadTask(void *arg) {
     threadFuncArg *threadArg = (threadFuncArg *)arg;
     for (int i = threadArg->shift; i < threadArg->shift + threadArg->iterNumber; ++i) {
-        threadArg->result += 1.0 / (i * 4.0 + 1.0);
-        threadArg->result -= 1.0 / (i * 4.0 + 3.0);
+        if (i % 2 == 0) {
+            threadArg->result += 1.0 / (i * 2.0 + 1.0);
+        } else {
+            threadArg->result -= 1.0 / (i * 2.0 + 1.0);
+        }
     }
     pthread_exit(&threadArg->result);
 }
