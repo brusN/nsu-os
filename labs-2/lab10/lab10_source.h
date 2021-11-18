@@ -15,11 +15,6 @@
 #define SUCCESS 0
 #define FAIL 1
 
-typedef struct st_inputArgs InputArgs;
-struct st_inputArgs {
-    int sleepSeconds;
-};
-
 typedef struct st_Food Food;
 struct st_Food {
     pthread_mutex_t eatLock;
