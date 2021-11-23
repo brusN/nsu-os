@@ -11,6 +11,7 @@
 #define PHIL_COUNT 5
 #define DELAY 30000
 #define START_FOOD 50
+#define THINK_TIME 1000000
 
 #define SUCCESS 0
 #define FAIL 1
@@ -26,7 +27,6 @@ struct st_PhilTaskArg {
     int philNumber;
     Food *food;
     pthread_mutex_t *forks;
-    int *priorities;
     int leftForkMutexID;
     int rightForkMutexID;
 };

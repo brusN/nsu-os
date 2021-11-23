@@ -10,7 +10,6 @@ void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food, pthread_
         taskArgs[i].philNumber = i;
         taskArgs[i].food = food;
         taskArgs[i].forks = forks;
-        taskArgs[i].priorities = 0;
         taskArgs[i].leftForkMutexID = i;
         taskArgs[i].rightForkMutexID = (i + 1 == PHIL_COUNT ? 0 : i + 1);
     }
@@ -66,7 +65,7 @@ void downFork(pthread_mutex_t *forks, int forkID, int philNum, char *philHand) {
 }
 
 void downForks(int philNumber, pthread_mutex_t *forks, int leftForkNum, int rightForkNum) {
-    if (rightForkNum < leftForkNum) {
+    if (leftForkNum > rightForkNum) {
         downFork(forks, rightForkNum, philNumber, "right");
         downFork(forks, leftForkNum, philNumber,  "left");
     } else {
@@ -81,14 +80,16 @@ void *philTask(void *arg) {
 
     int food = takeFood(taskArg->food);
     while (food) {
-        printf("[Phil %d] Get dish %d.\n", taskArg->philNumber, food);
+        printf("[Phil %d] Thinking...\n", taskArg->philNumber);
+        usleep(THINK_TIME); // Thinking
+        printf("[Phil %d] Getting dish %d\n", taskArg->philNumber, food);
         getForks(taskArg->philNumber, taskArg->forks, taskArg->leftForkMutexID, taskArg->rightForkMutexID);
-        printf("[Phil %d] Eating.\n", taskArg->philNumber);
-        usleep(DELAY * (START_FOOD - food + 1)); // Philosopher are thinking
+        printf("[Phil %d] Eating\n", taskArg->philNumber);
+        usleep(DELAY * (START_FOOD - food + 1)); // Eating
         downForks(taskArg->philNumber, taskArg->forks, taskArg->leftForkMutexID, taskArg->rightForkMutexID);
         food = takeFood(taskArg->food);
     }
-    printf("[Phil %d] Done eating.\n", taskArg->philNumber);
+    printf("[Phil %d] Done eating\n", taskArg->philNumber);
     pthread_exit(NULL);
 }
 
