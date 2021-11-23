@@ -1,12 +1,8 @@
 #include "lab10_source.h"
 
-void initFood(Food *food) {
+int initFood(Food *food) {
     food->foodLeft = START_FOOD;
-    int returnCode = pthread_mutex_init(&food->eatLock, NULL);
-    if (returnCode != SUCCESS) {
-        printPosixThreadError(pthread_self(), returnCode);
-        exit(EXIT_FAILURE);
-    }
+    return pthread_mutex_init(&food->eatLock, NULL);
 }
 
 void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food, pthread_mutex_t *forks) {
@@ -14,6 +10,7 @@ void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food, pthread_
         taskArgs[i].philNumber = i;
         taskArgs[i].food = food;
         taskArgs[i].forks = forks;
+        taskArgs[i].priorities = 0;
         taskArgs[i].leftForkMutexID = i;
         taskArgs[i].rightForkMutexID = (i + 1 == PHIL_COUNT ? 0 : i + 1);
     }
@@ -86,9 +83,8 @@ void *philTask(void *arg) {
     while (food) {
         printf("[Phil %d] Get dish %d.\n", taskArg->philNumber, food);
         getForks(taskArg->philNumber, taskArg->forks, taskArg->leftForkMutexID, taskArg->rightForkMutexID);
-
         printf("[Phil %d] Eating.\n", taskArg->philNumber);
-        usleep(DELAY * (START_FOOD - food + 1));
+        usleep(DELAY * (START_FOOD - food + 1)); // Philosopher are thinking
         downForks(taskArg->philNumber, taskArg->forks, taskArg->leftForkMutexID, taskArg->rightForkMutexID);
         food = takeFood(taskArg->food);
     }

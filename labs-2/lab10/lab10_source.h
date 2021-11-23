@@ -26,12 +26,13 @@ struct st_PhilTaskArg {
     int philNumber;
     Food *food;
     pthread_mutex_t *forks;
+    int *priorities;
     int leftForkMutexID;
     int rightForkMutexID;
 };
 
 
-void initFood(Food *food);
+int initFood(Food *food);
 void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food, pthread_mutex_t *forks);
 void *philTask(void *arg);
 int takeFood(Food *food);

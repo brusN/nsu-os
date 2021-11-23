@@ -9,7 +9,7 @@ int main(int argc, char **argv) {
     pthread_mutex_t forks[PHIL_COUNT];
     PhilTaskArg taskArgs[PHIL_COUNT];
 
-    // Init mutex
+    // Init mutexes
     int returnCode = 0;
     for (int i = 0; i < PHIL_COUNT; ++i) {
         returnCode = pthread_mutex_init(&forks[i], NULL);
@@ -21,7 +21,11 @@ int main(int argc, char **argv) {
 
     // Creating args for philosopher tasks
     Food food;
-    initFood(&food);
+    returnCode = initFood(&food);
+    if (returnCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), returnCode);
+        exit(EXIT_FAILURE);
+    }
     createPhilTasks(taskArgs, PHIL_COUNT, &food, forks);
 
     // Creating threads for philosophers
