@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <semaphore.h>
 #include <pthread.h>
+#include "error_handling.h"
 
 #define SUCCESS 0
 #define FAIL 1
@@ -14,17 +15,11 @@
 #define DETAIL_B_PRODUCTION_TIME 2
 #define DETAIL_C_PRODUCTION_TIME 3
 
-typedef struct st_widgetFactoryInfo WidgetFactoryInfo;
-struct st_widgetFactoryInfo {
-    int *countDetailsA;
-    int *countDetailsB;
-    int *countDetailsModule;
-    int *countDetailsC;
-    int *countWidgets;
-};
+sem_t semDetA, semDetB, semDetC, semModules, semWidgets;
 
-void sigintHandler(int signum);
-void initWidgetFactoryInfo(WidgetFactoryInfo *info);
+void signalHandler(int signum);
+
+int getSemaphoreValue(sem_t *sem);
 void initSemaphores();
 
 #endif //NSU_OS_LABS_LAB24_SOURCE_H

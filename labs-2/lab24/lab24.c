@@ -1,11 +1,7 @@
-#include <stdio.h>
-#include <unistd.h>
 #include "lab24_source.h"
 
 int main() {
-    signal(SIGINT, sigintHandler);
-    WidgetFactoryInfo info;
-    initWidgetFactoryInfo(&info);
-
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
     return EXIT_SUCCESS;
 }   

@@ -1,14 +1,21 @@
 #include "lab24_source.h"
 
-void sigintHandler(int signum) {
-    printf("Received SIGINT signal\nStopping factory...");
+void signalHandler(int signum) {
+    int countWidgets = getSemaphoreValue(&semWidgets);
+    printf("Received SIGINT signal\n"
+                "Stopping factory...\n"
+                "Number of produced widgets: %d\n", countWidgets);
+
     exit(EXIT_SUCCESS);
 }
 
-void initWidgetFactoryInfo(WidgetFactoryInfo *info) {
-    info->countDetailsA = 0;
-    info->countDetailsB = 0;
-    info->countDetailsModule = 0;
-    info->countDetailsC = 0;
-    info->countWidgets = 0;
+int getSemaphoreValue(sem_t *sem) {
+    int countWidgets;
+    int returnCode = sem_getvalue(sem, &countWidgets);
+    if (returnCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), returnCode);
+        exit(EXIT_FAILURE);
+    }
+    return countWidgets;
 }
+
