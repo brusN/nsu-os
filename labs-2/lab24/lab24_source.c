@@ -1,5 +1,48 @@
 #include "lab24_source.h"
 
+int parseInputArguments(int argc, char **argv, int *countRequiredWidgets) {
+    if (argc == NO_INPUT_ARGS) {
+        *countRequiredWidgets = MAX_PRODUCES_WIDGET_COUNT;
+        return parseInputArgs_SUCCESS;
+    }
+
+    if (argc != REQUIRED_COUNT_INPUT_ARGS) {
+        return parseInputArgs_ILLEGAL_COUNT_INPUT_ARGS;
+    }
+
+    long parsedRequiredCountWidgets;
+    int returnCode = str2long(&parsedRequiredCountWidgets, argv[1]);
+
+    if (returnCode == str2num_NOT_NUMBER || returnCode == str2num_EMPTY_STR) {
+        return parseInputArgs_NOT_A_NUMBER;
+    }
+
+    if (returnCode == str2num_ERANGE || parsedRequiredCountWidgets > MAX_PRODUCES_WIDGET_COUNT ||
+        parsedRequiredCountWidgets <= 0) {
+        return parseInputArgs_OUT_OF_RANGE;
+    }
+
+    *countRequiredWidgets = (int)parsedRequiredCountWidgets;
+    return parseInputArgs_SUCCESS;
+}
+
+void printParseInputArgsError(int returnCode) {
+    switch (returnCode) {
+        case parseInputArgs_NOT_A_NUMBER:
+            fprintf(stderr, "[Error] Input argument not a number\n");
+            break;
+        case parseInputArgs_OUT_OF_RANGE:
+            fprintf(stderr, "[Error] Input argument out of range! Number must be positive and less than max count constraint %d\n", MAX_PRODUCES_WIDGET_COUNT);
+            break;
+        case parseInputArgs_ILLEGAL_COUNT_INPUT_ARGS:
+            fprintf(stderr, "[Error] Illegal count arguments. Must be one or zero argument (sets default required count widgets)\n");
+            break;
+        default:
+            fprintf(stderr, "[Error] Unknown error code\n");
+            break;
+    }
+}
+
 void initModuleProducingInfo(ModuleProducingInfo *moduleProducingInfo, int countRequiredModules) {
     moduleProducingInfo->countRequiredDetailsA = countRequiredModules;
     moduleProducingInfo->countRequiredDetailsB = countRequiredModules;
@@ -33,13 +76,17 @@ void signalHandler(int signum) {
 }
 
 void *widgetProducerTask(void *arg) {
-    int countRequiredWidgets = *(int *)arg;
+    int countRequiredWidgets = *(int *) arg;
     WidgetProducingInfo widgetProducingInfo;
     initWidgetProducingInfo(&widgetProducingInfo, countRequiredWidgets);
 
     // Creating detail producers
-    validatePosixThreadFuncResult(pthread_create(&moduleProducerThID, NULL, moduleProducerTask, (void *)&widgetProducingInfo.countRequiredModules), "Creating modules producer thread");
-    validatePosixThreadFuncResult(pthread_create(&detailCProducerThID, NULL, detailCProducerTask, (void *)&widgetProducingInfo.countRequiredDetailsC), "Creating details C producer thread");
+    validatePosixThreadFuncResult(pthread_create(&moduleProducerThID, NULL, moduleProducerTask,
+                                                 (void *) &widgetProducingInfo.countRequiredModules),
+                                  "Creating modules producer thread");
+    validatePosixThreadFuncResult(pthread_create(&detailCProducerThID, NULL, detailCProducerTask,
+                                                 (void *) &widgetProducingInfo.countRequiredDetailsC),
+                                  "Creating details C producer thread");
 
     // Producing widgets
     int curWidgetsCount = 0;
@@ -61,7 +108,7 @@ void *widgetProducerTask(void *arg) {
 
 void *detailAProducerTask(void *args) {
     int producedDetailsA = 0;
-    int requiredDetailsA = *(int *)args;
+    int requiredDetailsA = *(int *) args;
     while (producedDetailsA < requiredDetailsA) {
         sleep(DETAIL_A_PRODUCTION_TIME);
         ++producedDetailsA;
@@ -73,7 +120,7 @@ void *detailAProducerTask(void *args) {
 
 void *detailBProducerTask(void *args) {
     int producedDetailsB = 0;
-    int requiredDetailsB = *(int *)args;
+    int requiredDetailsB = *(int *) args;
     while (producedDetailsB < requiredDetailsB) {
         sleep(DETAIL_B_PRODUCTION_TIME);
         ++producedDetailsB;
@@ -85,7 +132,7 @@ void *detailBProducerTask(void *args) {
 
 void *detailCProducerTask(void *args) {
     int producedDetailsC = 0;
-    int requiredDetailsC = *(int *)args;
+    int requiredDetailsC = *(int *) args;
     while (producedDetailsC < requiredDetailsC) {
         sleep(DETAIL_C_PRODUCTION_TIME);
         ++producedDetailsC;
@@ -96,11 +143,15 @@ void *detailCProducerTask(void *args) {
 }
 
 void *moduleProducerTask(void *args) {
-    int countRequiredModules = *(int *)args;
+    int countRequiredModules = *(int *) args;
     ModuleProducingInfo moduleProducingInfo;
     initModuleProducingInfo(&moduleProducingInfo, countRequiredModules);
-    validatePosixThreadFuncResult(pthread_create(&detailAProducerThID, NULL, detailAProducerTask, &moduleProducingInfo.countRequiredDetailsA), "Creating details A producer thread");
-    validatePosixThreadFuncResult(pthread_create(&detailBProducerThID, NULL, detailBProducerTask, &moduleProducingInfo.countRequiredDetailsB), "Creating details B producer thread");
+    validatePosixThreadFuncResult(
+            pthread_create(&detailAProducerThID, NULL, detailAProducerTask, &moduleProducingInfo.countRequiredDetailsA),
+            "Creating details A producer thread");
+    validatePosixThreadFuncResult(
+            pthread_create(&detailBProducerThID, NULL, detailBProducerTask, &moduleProducingInfo.countRequiredDetailsB),
+            "Creating details B producer thread");
 
     int curProducedModules = 0;
     while (curProducedModules < countRequiredModules) {
