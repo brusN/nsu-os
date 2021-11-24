@@ -1,22 +1,15 @@
 #include "error_handling.h"
+#include "../mylib/error_handling.h"
 
-ThreadErrorState createThreadErrState(pthread_t thID, int errCode) {
-    ThreadErrorState state;
-    state.thID = thID;
-    state.errCode = errCode;
-    return state;
+// Handling the return value of pthread functions
+void validatePosixThreadFuncResult(int returnCode, const char *comment) {
+    if (returnCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), returnCode, comment);
+        exit(EXIT_FAILURE);
+    }
 }
 
-int isThreadErrStateSuccess(ThreadErrorState state) {
-    return state.errCode == SUCCESS;
-}
-
-void threadErrorExit(ThreadErrorState state) {
-    printPosixThreadError(state.thID, state.errCode);
-    exit(EXIT_FAILURE);
-}
-
-void printPosixThreadError(pthread_t threadID, int code) {
+void printPosixThreadError(pthread_t threadID, int code, const char *comment) {
     char errMsgBuffer[ERR_MSG_BUFFER_LEN];
     if (strerror_r(code, errMsgBuffer, ERR_MSG_BUFFER_LEN) != SUCCESS) {
         if (errno == EINVAL) {
@@ -24,6 +17,6 @@ void printPosixThreadError(pthread_t threadID, int code) {
         }
         fprintf(stderr, "Insufficient storage to contain the generated message string!\n");
     } else {
-        fprintf(stderr, "[ThreadID: %lu] %s\n", threadID, errMsgBuffer);
+        fprintf(stderr, "[ThreadID: %lu] Where >> %s | %s\n", threadID, comment, errMsgBuffer);
     }
 }

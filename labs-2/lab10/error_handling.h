@@ -12,16 +12,7 @@
 #define ERR_MSG_BUFFER_LEN 32
 #define SEE_ERRNO_CODE -1
 
-// Error handling in threads realization
-typedef struct st_ThreadErrorState ThreadErrorState;
-struct st_ThreadErrorState {
-    pthread_t thID;
-    int errCode;
-};
-
-ThreadErrorState createThreadErrState(pthread_t thID, int errCode);
-int isThreadErrStateSuccess(ThreadErrorState state);
-void threadErrorExit(ThreadErrorState state);
-void printPosixThreadError(pthread_t threadID, int code);
+void validatePosixThreadFuncResult(int returnCode, const char *comment);
+void printPosixThreadError(pthread_t threadID, int code, const char *comment);
 
 #endif //NSU_OS_LABS_ERROR_HANDLING_H

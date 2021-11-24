@@ -5,47 +5,25 @@
 #include "lab10_source.h"
 
 int main(int argc, char **argv) {
-    pthread_t philosophers[PHIL_COUNT];
-    pthread_mutex_t forks[PHIL_COUNT];
-    PhilTaskArg taskArgs[PHIL_COUNT];
-
-    // Init mutexes
-    int returnCode = 0;
-    for (int i = 0; i < PHIL_COUNT; ++i) {
-        returnCode = pthread_mutex_init(&forks[i], NULL);
-        if (returnCode != SUCCESS) {
-            printPosixThreadError(pthread_self(), returnCode);
-            exit(EXIT_FAILURE);
-        }
-    }
+    validatePosixThreadFuncResult(initMutexes(), "Initiating mutexes");
 
     // Creating args for philosopher tasks
     Food food;
-    returnCode = initFood(&food);
-    if (returnCode != SUCCESS) {
-        printPosixThreadError(pthread_self(), returnCode);
-        exit(EXIT_FAILURE);
-    }
-    createPhilTasks(taskArgs, PHIL_COUNT, &food, forks);
+    validatePosixThreadFuncResult(initFood(&food), "Initiating food");
+    PhilTaskArg taskArgs[PHIL_COUNT];
+    createPhilTasks(taskArgs, PHIL_COUNT, &food);
 
     // Creating threads for philosophers
+    pthread_t philosophers[PHIL_COUNT];
     for (int i = 0; i < PHIL_COUNT; ++i) {
-        returnCode = pthread_create(&philosophers[i], NULL, philTask, (void *)(&taskArgs[i]));
-        if (returnCode != SUCCESS) {
-            printPosixThreadError(pthread_self(), returnCode);
-            exit(EXIT_FAILURE);
-        }
+        validatePosixThreadFuncResult(pthread_create(&philosophers[i], NULL, philTask, (void *)(&taskArgs[i])), "Creating threads for philosophers");
+    }
+    for (int i = 0; i < PHIL_COUNT; ++i) {
+        validatePosixThreadFuncResult(pthread_join(philosophers[i], NULL), "Joining threads");
     }
 
-    // Joining threads
-    for (int i = 0; i < PHIL_COUNT; ++i) {
-        returnCode = pthread_join(philosophers[i], NULL);
-        if (returnCode != SUCCESS) {
-            printPosixThreadError(pthread_self(), returnCode);
-            exit(EXIT_FAILURE);
-        }
-    }
-
+    // Free resources
+    validatePosixThreadFuncResult(destroyMutexes(), "Destroying mutexes");
     return EXIT_SUCCESS;
 }
 

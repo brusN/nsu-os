@@ -16,6 +16,8 @@
 #define SUCCESS 0
 #define FAIL 1
 
+pthread_mutex_t forks[PHIL_COUNT];
+
 typedef struct st_Food Food;
 struct st_Food {
     pthread_mutex_t eatLock;
@@ -26,19 +28,19 @@ typedef struct st_PhilTaskArg PhilTaskArg;
 struct st_PhilTaskArg {
     int philNumber;
     Food *food;
-    pthread_mutex_t *forks;
     int leftForkMutexID;
     int rightForkMutexID;
 };
 
-
 int initFood(Food *food);
-void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food, pthread_mutex_t *forks);
+int initMutexes();
+void createPhilTasks(PhilTaskArg *taskArgs, int countPhils, Food *food);
 void *philTask(void *arg);
 int takeFood(Food *food);
-void getFork(pthread_mutex_t *forks, int forkID, int philNum, char *philHand);
-void getForks(int philNumber, pthread_mutex_t *forks, int leftForkNum, int rightForkNum);
-void downFork(pthread_mutex_t *forks, int forkID, int philNum, char *philHand);
-void downForks(int philNumber, pthread_mutex_t *forks, int leftForkNum, int rightForkNum);
+void getFork(int forkID, int philNum, char *philHand);
+void getForks(int philNumber, int leftForkNum, int rightForkNum);
+void downFork(int forkID, int philNum, char *philHand);
+void downForks(int philNumber, int leftForkNum, int rightForkNum);
+int destroyMutexes();
 
 #endif //NSU_OS_LABS_LAB10_SOURCE_H
