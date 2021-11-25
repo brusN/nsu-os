@@ -14,8 +14,9 @@ int main(int argc, char **argv) {
 
     // Starting fabric
     initSemaphores();
-
-    validatePosixThreadFuncResult(pthread_create(&widgetProducerThID, NULL, widgetProducerTask, (void *)&requiredCountWidgets), "Creating widget producer thread");
+    validatePosixThreadFuncResult(
+            pthread_create(&widgetProducerThID, NULL, widgetProducerTask, (void *) &requiredCountWidgets),
+            "Creating widget producer thread");
     validatePosixThreadFuncResult(pthread_join(widgetProducerThID, NULL), "Joining widget producer thread");
     printf("Production has finished\n");
     printProductionResult();

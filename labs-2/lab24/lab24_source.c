@@ -22,7 +22,7 @@ int parseInputArguments(int argc, char **argv, int *countRequiredWidgets) {
         return parseInputArgs_OUT_OF_RANGE;
     }
 
-    *countRequiredWidgets = (int)parsedRequiredCountWidgets;
+    *countRequiredWidgets = (int) parsedRequiredCountWidgets;
     return parseInputArgs_SUCCESS;
 }
 
@@ -32,10 +32,13 @@ void printParseInputArgsError(int returnCode) {
             fprintf(stderr, "[Error] Input argument not a number\n");
             break;
         case parseInputArgs_OUT_OF_RANGE:
-            fprintf(stderr, "[Error] Input argument out of range! Number must be positive and less than max count constraint %d\n", MAX_PRODUCES_WIDGET_COUNT);
+            fprintf(stderr,
+                    "[Error] Input argument out of range! Number must be positive and less than max count constraint %d\n",
+                    MAX_PRODUCES_WIDGET_COUNT);
             break;
         case parseInputArgs_ILLEGAL_COUNT_INPUT_ARGS:
-            fprintf(stderr, "[Error] Illegal count arguments. Must be one or zero argument (sets default required count widgets)\n");
+            fprintf(stderr,
+                    "[Error] Illegal count arguments. Must be one or zero argument (sets default required count widgets)\n");
             break;
         default:
             fprintf(stderr, "[Error] Unknown error code\n");
