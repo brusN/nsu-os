@@ -1,29 +1,47 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include "error_handling.h"
 #include "lab10_source.h"
+#include "error_handling.h"
 
-int main(int argc, char **argv) {
-    validatePosixThreadFuncResult(initMutexes(), "Initiating mutexes");
+int main() {
+    // Contains info about initialized resources, which signal to clean resources function
+    // which resources should be free after success or fail execution
+    ResourcesInfo initializedResourcesInfo;
+    initResourcesInfo(&initializedResourcesInfo);
 
-    // Creating args for philosopher tasks
-    Food food;
-    validatePosixThreadFuncResult(initFood(&food), "Initiating food");
-    PhilTaskArg taskArgs[PHIL_COUNT];
-    createPhilTasks(taskArgs, PHIL_COUNT, &food);
+    // Initializing fork mutexes
+    int retCode = initMutexes(forks, PHIL_COUNT);
+    if (retCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), retCode, "Initializing forks mutexes");
+        exit(EXIT_FAILURE);
+    }
+    initializedResourcesInfo.isForksMutexesInitialized = RESOURCE_INITIALIZED;
+
+    // Initializing food and eat lock mutex
+    retCode = initFood(&food, FOOD_INIT_COUNT);
+    if (retCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), retCode, "Initializing food");
+        cleanResources(&initializedResourcesInfo);
+        exit(EXIT_FAILURE);
+    }
+    initializedResourcesInfo.isFoodMutexInitialized = RESOURCE_INITIALIZED;
 
     // Creating threads for philosophers
-    pthread_t philosophers[PHIL_COUNT];
-    for (int i = 0; i < PHIL_COUNT; ++i) {
-        validatePosixThreadFuncResult(pthread_create(&philosophers[i], NULL, philTask, (void *)(&taskArgs[i])), "Creating threads for philosophers");
-    }
-    for (int i = 0; i < PHIL_COUNT; ++i) {
-        validatePosixThreadFuncResult(pthread_join(philosophers[i], NULL), "Joining threads");
+    PhilTaskArg taskArgs[PHIL_COUNT];
+    initPhilTaskArgs(taskArgs, PHIL_COUNT, &food);
+    retCode = createPhilsThreads(philsThID, PHIL_COUNT, taskArgs);
+    if (retCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), retCode, "Creating threads for philosophers");
+        cleanResources(&initializedResourcesInfo);
+        exit(EXIT_FAILURE);
     }
 
-    // Free resources
-    validatePosixThreadFuncResult(destroyMutexes(), "Destroying mutexes");
+    // Joining philosophers threads
+    retCode = joinPhilsThreads(philsThID, PHIL_COUNT);
+    if (retCode != SUCCESS) {
+        printPosixThreadError(pthread_self(), retCode, "Joining philosophers threads");
+        cleanResources(&initializedResourcesInfo);
+        exit(EXIT_FAILURE);
+    }
+
+    cleanResources(&initializedResourcesInfo);
     return EXIT_SUCCESS;
 }
-
