@@ -43,11 +43,8 @@ struct st_WidgetProducingInfo {
 
 // Input args handling
 int parseInputArguments(int argc, char **argv, int *countRequiredWidgets);
-
 void printParseInputArgsError(int returnCode);
-
 void initModuleProducingInfo(ModuleProducingInfo *moduleProducingInfo, int countRequiredModules);
-
 void initWidgetProducingInfo(WidgetProducingInfo *widgetProducingInfo, int countRequiredWidgets);
 
 // Signal handling
@@ -55,20 +52,16 @@ void signalHandler(int signum);
 
 // Semaphores
 void initSemaphores();
-
 void destroySemaphores();
 
 // Producer tasks
+int startWidgetsFactory(WidgetProducingInfo *producingInfo);
 void *detailAProducerTask(void *arg);
-
 void *detailBProducerTask(void *arg);
-
 void *moduleProducerTask(void *arg);
-
 void *detailCProducerTask(void *arg);
-
 void *widgetProducerTask(void *arg);
 
-void printProductionResult();
+int printProductionResult();
 
 #endif //NSU_OS_LABS_LAB24_SOURCE_H
