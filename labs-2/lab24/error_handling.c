@@ -8,6 +8,6 @@ void printPosixThreadError(pthread_t threadID, int code, const char *comment) {
         }
         fprintf(stderr, "Insufficient storage to contain the generated message string!\n");
     } else {
-        fprintf(stderr, "[ThreadID: %lu] Where >> %s | %s\n", threadID, comment, errMsgBuffer);
+        fprintf(stderr, "[ThreadID: %lu] %s >> %s\n", threadID, comment, errMsgBuffer);
     }
 }
