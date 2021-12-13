@@ -70,23 +70,11 @@ int destroySemaphores() {
 }
 
 void cleanupOnParentThreadExit(void *arg) {
-    printf("Parent cleanup!\n");
-    int retCode = pthread_cancel(childThreadID);
+    int retCode = destroySemaphores();
     if (retCode != SUCCESS) {
-        printPosixThreadError(pthread_self(), retCode, "Cancelling child thread");
+        printPosixThreadError(pthread_self(), errno, "Destroying semaphores");
         exit(EXIT_FAILURE);
     }
-    retCode = sem_destroy(&childThSem);
-    if (retCode != SUCCESS) {
-        printPosixThreadError(pthread_self(), errno, "Destroying child thread semaphore");
-        exit(EXIT_FAILURE);
-    }
-    retCode = sem_destroy(&parentThSem);
-    if (retCode != SUCCESS) {
-        printPosixThreadError(pthread_self(), errno, "Destroying parent thread semaphore");
-        exit(EXIT_FAILURE);
-    }
-    printf("Parent cleanup finish!\n");
 }
 
 void *childThreadTask(void *arg) {

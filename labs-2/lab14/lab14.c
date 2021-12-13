@@ -25,12 +25,22 @@ int main(int argc, char **argv) {
                 retCode = sem_wait(&childThSem);
                 if (retCode != SUCCESS) {
                     printPosixThreadError(pthread_self(), retCode, "Wait child thread semaphore");
+                    retCode = pthread_cancel(childThreadID);
+                    if (retCode != SUCCESS) {
+                        printPosixThreadError(pthread_self(), retCode, "Cancelling child thread");
+                        exit(EXIT_FAILURE);
+                    }
                     pthread_exit(PTHREAD_CANCELED);
                 }
                 printf("[P] Text #%d\n", rowNumber);
                 retCode = sem_post(&parentThSem);
                 if (retCode != SUCCESS) {
                     printPosixThreadError(pthread_self(), retCode, "Post parent thread semaphore");
+                    retCode = pthread_cancel(childThreadID);
+                    if (retCode != SUCCESS) {
+                        printPosixThreadError(pthread_self(), retCode, "Cancelling child thread");
+                        exit(EXIT_FAILURE);
+                    }
                     pthread_exit(PTHREAD_CANCELED);
                 }
             }
@@ -39,11 +49,6 @@ int main(int argc, char **argv) {
                 printPosixThreadError(pthread_self(), retCode, "Joining child thread");
                 pthread_exit(PTHREAD_CANCELED);
             }
-    pthread_cleanup_pop(DONT_EXECUTE_CLEANUP_FUNC);
-    retCode = destroySemaphores();
-    if (retCode != SUCCESS) {
-        // Error description has printed by destroySemaphores()
-        fprintf(stderr, "[Error] Error while destroying semaphores\n");
-    }
+    pthread_cleanup_pop(EXECUTE_CLEANUP_FUNC);
     return EXIT_SUCCESS;
 }
